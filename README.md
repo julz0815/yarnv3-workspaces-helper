@@ -29,6 +29,11 @@ and
   }
 ```
 
+Once the yarn.lock files are generated run your SCA scan this way
+```
+srcclr scan . --recursive --scan-collectors yarn
+```
+
 ### The output
 The output of the run will look similar to this:
 ```
