@@ -1,0 +1,42 @@
+{
+  "name": "generate-yarn-lockfile",
+  "version": "0.0.1",
+  "description": "CLI to generate a yarn lockfile for all yarn Workspaces, to be scannable with Veracode SCA. Based on Chris Pavlicek <chris@vars.is> work from https://github.com/varsis/generate-lockfile.git",
+  "main": "index.js",
+  "author": "Julian Totzek-Hallhuber (Veracode) jtotzekhallhuber@veracode.com",
+  "license": "MIT",
+  "scripts": {
+    "build": "rm -rf ./dist/index.js && ncc build src/entry.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/varsis/generate-lockfile.git"
+  },
+  "bin": {
+    "generate-lockfile": "./bin/index.js"
+  },
+  "dependencies": {
+    "@yarnpkg/lockfile": "^1.1.0",
+    "chalk": "^4.1.0",
+    "commander-plus": "^0.0.6",
+    "tsc": "^2.0.4"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.14",
+    "@types/expect": "^24.3.0",
+    "@types/mocha": "^8.0.4",
+    "@types/node": "^14.18.63",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "@typescript-eslint/parser": "^4.8.2",
+    "chai": "^4.2.0",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-functional": "^3.1.0",
+    "mocha": "^8.2.1",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.2.1",
+    "ts-mocha": "^8.0.0",
+    "typescript": "^4.9.5"
+  }
+}
