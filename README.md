@@ -37,18 +37,18 @@ srcclr scan . --recursive --scan-collectors yarn
 ### The output
 The output of the run will look similar to this:
 ```
-node dist/index.js --folder '/Users/jtotzekhallhuber/git/yarn-workspaces-example'
+node dist/index.js --folder '/yarn-workspaces-example'
 ## WORKSPADCES: ["packages/*"]
 
-## Running /Users/jtotzekhallhuber/git/yarn-workspaces-example/packages/*...
+## Running /yarn-workspaces-example/packages/*...
 #### SUBFOLDER: ["a","b"]
-#### Running /Users/jtotzekhallhuber/git/yarn-workspaces-example/packages/a...
+#### Running /yarn-workspaces-example/packages/a...
 ###### package.json exists, create a yarn.lock file
-Overwriting: /Users/jtotzekhallhuber/git/yarn-workspaces-example/packages/a/yarn.lock
-Lockfile written to: /Users/jtotzekhallhuber/git/yarn-workspaces-example/packages/a/yarn.lock
-#### Running /Users/jtotzekhallhuber/git/yarn-workspaces-example/packages/b...
+Overwriting: /yarn-workspaces-example/packages/a/yarn.lock
+Lockfile written to: /yarn-workspaces-example/packages/a/yarn.lock
+#### Running /yarn-workspaces-example/packages/b...
 ###### package.json exists, create a yarn.lock file
-Lockfile written to: /Users/jtotzekhallhuber/git/yarn-workspaces-example/packages/b/yarn.lock
+Lockfile written to: /yarn-workspaces-example/packages/b/yarn.lock
 ```
 
 ### Building
