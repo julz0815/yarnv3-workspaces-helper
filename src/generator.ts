@@ -1,11 +1,11 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import * as lock from '@yarnpkg/lockfile'
+import { parseSyml, stringifySyml } from '@yarnpkg/parsers'
 import chalk from 'chalk'
 import { log } from './logger'
 
 interface IParsedLockfile {
-    [packageNameWithVersion: string]: IPackageDetails
+    [packageNameWithVersionAndRepo: string]: IPackageDetails
 }
 
 interface IDependencyObject {
@@ -14,38 +14,55 @@ interface IDependencyObject {
 
 interface IPackageDetails {
     version: string
-    resolved: string
-    integrity: string
+    resolution: string
+    checksum: string
+    languageName: string
+    linkType: string
     dependencies?: IDependencyObject
     optionalDependencies?: IDependencyObject
 }
 
-const getDependencyKey = (key: string, version: string) => `${key}@${version}`
+export const generateLockfileString = (
+    dependencies: { [k: string]: string },
+    parsedLockfile: IParsedLockfile,
+    foundDependencies: Record<string, IPackageDetails> = {}
+): string => stringifySyml(generateLockfileObject(dependencies, parsedLockfile, foundDependencies))
+    
+const escapeRegex = (inputString: string) => inputString.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 
-export const generateLockfileObject = (
+    const findPackageDetails = (key: string, version: string, lockFile: IParsedLockfile): { details: IPackageDetails, key: string }| null => {
+    const exp = new RegExp(`(^| )${escapeRegex(key)}@\\w+:${escapeRegex(version)}`)
+    const foundKey = Object.keys(lockFile).find(k => exp.test(k))
+    log(`Looking for ${key} ${version} ${exp}`)
+    return { key: foundKey, details: lockFile[foundKey] } ?? null
+}
+
+const generateLockfileObject = (
     dependencies: { [k: string]: string },
     parsedLockfile: IParsedLockfile,
     foundDependencies: Record<string, IPackageDetails> = {}
 ) => {
     for (const key of Object.keys(dependencies)) {
         const version = dependencies[key]
-        const dependencyKey = getDependencyKey(key, version)
+        const dependencyDetails = findPackageDetails(key, version, parsedLockfile)
+        const lockfileKey = dependencyDetails.key
+        const dependencyFromLockfile = dependencyDetails.details
 
-        if (dependencyKey in foundDependencies) {
-            log(chalk.yellow('Dependency already resolved'), chalk.blue(dependencyKey))
+        if (lockfileKey in foundDependencies) {
+            log(chalk.yellow('Dependency already resolved'), chalk.blue(lockfileKey))
             continue
         }
 
         // Add the dependency
-        if (!(dependencyKey in parsedLockfile)) {
-            log(chalk.red(`Could not find: ${dependencyKey}`))
-            //throw new Error(`Could not find: ${dependencyKey}`)
+        if (!dependencyFromLockfile) {
+            log(chalk.red(`Could not find: ${key} ${version}`))
+            //throw new Error(`Could not find: ${key} ${version}`)
         }
         else {
-        
-  
-            const dependencyFromLockfile: IPackageDetails = parsedLockfile[dependencyKey]
-            foundDependencies[dependencyKey] = dependencyFromLockfile
+
+            
+
+            foundDependencies[lockfileKey] = dependencyFromLockfile
 
             // Get any dependencies under this dependency
             if (dependencyFromLockfile.dependencies || dependencyFromLockfile.optionalDependencies) {
@@ -57,6 +74,10 @@ export const generateLockfileObject = (
             }
         }
     }
+
+    // Copy metadata
+    foundDependencies.__metadata = parsedLockfile.__metadata
+    console.log(Object.keys(foundDependencies))
     return foundDependencies
 }
 
@@ -65,7 +86,7 @@ export const getAndParseFiles = (lockFilePath: string, packageFilePath: string) 
     log(chalk.whiteBright('Package.json:'), chalk.green(packageFilePath))
 
     const lockfileString = fs.readFileSync(path.resolve(lockFilePath), 'utf8')
-    const inputLockfile = lock.parse(lockfileString)
+    const inputLockfile = parseSyml(lockfileString)
     const inputPackageJson = JSON.parse(fs.readFileSync(path.resolve(packageFilePath), 'utf8'))
 
     return {

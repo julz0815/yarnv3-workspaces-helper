@@ -1,11 +1,10 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import * as lock from '@yarnpkg/lockfile'
 import chalk from 'chalk'
 import program from 'commander-plus'
 import pkg from '../package.json'
 import { log, setVerbose } from './logger'
-import { generateLockfileObject, getAndParseFiles } from './generator'
+import { generateLockfileString, getAndParseFiles } from './generator'
 
 program
     .version(pkg.version)
@@ -25,7 +24,7 @@ if (missingRequiredArg) {
     program.help()
 }
 
-setVerbose(program.verbose)
+setVerbose(true)
 
 
 //read the workspaces from the package.json
@@ -95,9 +94,9 @@ workspaces.forEach(workspace => {
                 try {
                     const { inputLockfile, inputPackageJson } = getAndParseFiles(myLockfile, myPackage)
                     log('Using dev:', chalk.cyan(program.dev))
-                    const lockfileObject = generateLockfileObject(
+                    const lockfileString = generateLockfileString(
                         { ...inputPackageJson.dependencies, ...(program.dev ? inputPackageJson.devDependencies : {}) },
-                        inputLockfile.object
+                        inputLockfile
                     )
                 
                     if (myWrite) {
@@ -111,9 +110,9 @@ workspaces.forEach(workspace => {
                             console.log(chalk.yellow('Overwriting:'), chalk.red(myWrite))
                         }
                         console.log(chalk.yellow('Lockfile written to:'), chalk.blue(myWrite))
-                        fs.writeFileSync(path.resolve(myWrite), lock.stringify(lockfileObject))
+                        fs.writeFileSync(path.resolve(myWrite), lockfileString)
                     } else {
-                        console.log(lock.stringify(lockfileObject))
+                        console.log(lockfileString)
                     }
                 } catch (err) {
                     console.error('Error:', chalk.red(err))
@@ -145,9 +144,9 @@ workspaces.forEach(workspace => {
             try {
                 const { inputLockfile, inputPackageJson } = getAndParseFiles(myLockfile, myPackage)
                 log('Using dev:', chalk.cyan(program.dev))
-                const lockfileObject = generateLockfileObject(
+                const lockfileString = generateLockfileString(
                     { ...inputPackageJson.dependencies, ...(program.dev ? inputPackageJson.devDependencies : {}) },
-                    inputLockfile.object
+                    inputLockfile
                 )
             
                 if (myWrite) {
@@ -161,9 +160,9 @@ workspaces.forEach(workspace => {
                         console.log(chalk.yellow('Overwriting:'), chalk.red(myWrite))
                     }
                     console.log(chalk.yellow('Lockfile written to:'), chalk.blue(myWrite))
-                    fs.writeFileSync(path.resolve(myWrite), lock.stringify(lockfileObject))
+                    fs.writeFileSync(path.resolve(myWrite), lockfileString)
                 } else {
-                    console.log(lock.stringify(lockfileObject))
+                    console.log(lockfileString)
                 }
             } catch (err) {
                 console.error('Error:', chalk.red(err))

@@ -18,15 +18,19 @@ It will also create entries for other workspaces referenced in the same yarn wor
 
 It supports workspace entries in both formats:
 ```
-"workspaces": [
-    "packages/*"
-  ]
+"workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
 ```
 and
 ```
 "workspaces": {
-    "packages/folder"
-  }
+    "packages": [
+      "packages/folder"
+    ]
+  },
 ```
 
 Once the yarn.lock files are generated run your SCA scan this way
