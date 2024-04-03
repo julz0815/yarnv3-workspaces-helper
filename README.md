@@ -36,8 +36,35 @@ and
 Once the yarn.lock files are generated run your SCA scan this way
 ```
 srcclr scan . --recursive --scan-collectors yarn
+```  
+  
+### Monorepository support  
+If you have a monorepository with multiple folders and individual package.json files ine each folder, you can run the tool on the root folder and it will scan all subfolders for package.json files and create a yarn.lock file in each folder. To achieve taht you simply add a little bash or powershell script to run the tool on each folder.  
+This is only required if there are multiple folders with a root package.json file.
+  
+For example, in bash you can run the following script:
+```
+for dir in */; do
+    dir=${dir%/}
+
+    if [ -d "$dir" ]; then
+        echo "Running node script for folder: $dir"
+        node dist/index.js --folder "$dir"
+    fi
+done
 ```
 
+The powershell script would look like this:
+```
+$subdirectories = Get-ChildItem -Directory
+
+foreach ($dir in $subdirectories) {
+    $dirName = $dir.Name
+    Write-Host "Running node script for folder: $dirName"
+    node dist/index.js --folder $dirName
+}
+```  
+  
 ### The output
 The output of the run will look similar to this:
 ```
